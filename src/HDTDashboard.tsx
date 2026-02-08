@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { Heart, Activity, Droplet, Gauge, Calculator, TrendingUp, AlertCircle, GitBranch, Sun, Moon } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Heart, Activity, Droplet, Gauge, Calculator, TrendingUp, GitBranch, Sun, Moon } from 'lucide-react';
 
 const HDTDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
-  const [selectedMetric, setSelectedMetric] = useState(null);
+  const [selectedMetric, setSelectedMetric] = useState<string | null>(null);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
   // Theme colors
@@ -220,16 +220,24 @@ const HDTDashboard = () => {
     ]
   };
 
-  const StatusIndicator = ({ status }) => {
-    const colors = {
+  const StatusIndicator = ({ status }: { status?: string }) => {
+    const colors: { [key: string]: string } = {
       normal: 'bg-green-500',
       warning: 'bg-yellow-500',
       critical: 'bg-red-500'
     };
-    return <div className={`w-2 h-2 rounded-full ${colors[status] || colors.normal}`} />;
+    return <div className={`w-2 h-2 rounded-full ${colors[status || 'normal'] || colors.normal}`} />;
   };
 
-  const MetricCard = ({ name, value, unit, status, normal, sources, onClick }) => (
+  const MetricCard = ({ name, value, unit, status, normal, sources, onClick }: {
+    name: string;
+    value: number;
+    unit: string;
+    status?: string;
+    normal?: string;
+    sources?: string[];
+    onClick?: () => void;
+  }) => (
     <div 
       className={`${theme.cardBg} rounded-lg p-4 border ${theme.border} ${onClick ? 'cursor-pointer hover:border-blue-500 transition-all' : ''}`}
       onClick={onClick}
@@ -255,10 +263,10 @@ const HDTDashboard = () => {
     </div>
   );
 
-  const MappingModal = ({ metric, onClose }) => {
-    if (!metric || !dataDrivenMapping[metric]) return null;
+  const MappingModal = ({ metric, onClose }: { metric: string | null; onClose: () => void }) => {
+    if (!metric || !dataDrivenMapping[metric as keyof typeof dataDrivenMapping]) return null;
     
-    const mapping = dataDrivenMapping[metric];
+    const mapping = dataDrivenMapping[metric as keyof typeof dataDrivenMapping];
     
     return (
       <div className={`fixed inset-0 ${theme.modalOverlay} flex items-center justify-center z-50 p-4`} onClick={onClose}>
